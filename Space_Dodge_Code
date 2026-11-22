@@ -1,0 +1,116 @@
+let y = 200;
+let obstacles = [];
+let score = 0;
+let gameOver = false;
+let started = false;
+
+function setup() {
+  createCanvas(600, 400);
+}
+
+function draw() {
+  background(0);
+
+  // start
+  if (started == false) {
+
+    fill(120, 220, 255);
+    textAlign(CENTER, CENTER);
+
+    textSize(40);
+    text("Space Dodger", width / 2, height / 2 - 50);
+
+    fill(255);
+    textSize(24);
+    text("Press any key to start", width / 2, height / 2 + 10);
+
+    return;
+  }
+
+  // game over
+  if (gameOver == true) {
+
+    fill(255);
+    textAlign(CENTER, CENTER);
+
+    textSize(30);
+    text("Game Over", width / 2, height / 2);
+
+    textSize(16);
+    text("Press R to restart", width / 2, height / 2 + 35);
+
+    return;
+  }
+
+  // player
+fill(255,0,0);
+  stroke(255,255,255);
+  strokeWeight(4);
+
+triangle(80 + 20, y, 80 - 12, y - 15, 80 - 12, y + 15);
+
+  noStroke();
+
+  if (keyIsDown(UP_ARROW)) {
+    y -= 5;
+  }
+
+  if (keyIsDown(DOWN_ARROW)) {
+    y += 5;
+  }
+
+  y = constrain(y, 20, height - 20);
+
+  if (frameCount % 40 == 0) {
+
+    obstacles.push({
+      x: width,
+      y: random(40, height - 40),
+      d: random(40, 90),
+      c: color(random(80, 255), random(80, 255), random(80, 255))
+    });
+  }
+
+  for (let i = 0; i < obstacles.length; i++) {
+
+    let o = obstacles[i];
+
+    fill(o.c);
+    circle(o.x, o.y, o.d);
+
+    o.x -= 5;
+
+    if (o.x < -30) {
+      obstacles.splice(i, 1);
+    }
+
+    // hit
+    if (dist(80, y, o.x, o.y) < 15 + o.d / 2) {
+      gameOver = true;
+    }
+  }
+  
+  if (frameCount % 6 == 0) {
+    score++;
+  }
+
+  fill(255);
+  textAlign(LEFT, TOP);
+
+  textSize(20);
+  text("Score: " + score, 20, 15);
+}
+
+function keyPressed() {
+
+  started = true;
+
+  // restart
+  if (gameOver && (key == "r" || key == "R")) {
+
+    gameOver = false;
+    score = 0;
+    obstacles = [];
+    y = 200;
+  }
+}
